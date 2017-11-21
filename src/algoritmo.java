@@ -1,99 +1,67 @@
-import java.io.File;
-import java.util.Random;
-import java.util.Scanner;
-import java.util.Random;
 import java.util.Arrays;
 
-import org.omg.CORBA.PUBLIC_MEMBER;
+import controle.Problema;
 
 public class algoritmo {
 
 	public static void main(String args[]) {
+		String nomeDoArquivo = "problema1.txt";
+		Leitor leitor = new Leitor(nomeDoArquivo);
 
-		String nomeDoArquivo = "problema2.txt";
-		int b = 0; // vai receber a capacidade da mochila
-		int nobj = 0; // vai receber a quantidade de genes
-		int beneficio[] = null;
-		int peso[] = null;
-		int loop = 30;
-		int aux_melhor[] = new int[loop + 1];
+		Problema problema = leitor.lerArquivo(); // ler arquivo
 
-		// ler arquivo
+		int auxMelhor[] = new int[Config.loop + 1];
 
-		try {
-			Scanner scanner = new Scanner(new File(nomeDoArquivo));
-			nobj = scanner.nextInt();
-			b = scanner.nextInt();
-
-			beneficio = new int[nobj];
-			peso = new int[nobj];
-
-			for (int i = 0; i < nobj; i++) {
-				String texto = scanner.next();
-				String aux[] = texto.split(";");
-				beneficio[i] = Integer.parseInt(aux[0]);
-				peso[i] = Integer.parseInt(aux[1]);
-			}
-
-		} catch (Exception ioe) {
-			ioe.printStackTrace();
-		}
-		for (int x = 0; x <= loop; x++) { // for 30 vezes
-
-			// definir parametros
-			float prob_recombinacao = 0.95f;
-			float prob_mutacao = 0.1f;
-			int numero_ind = 10;
-			int alpha = 1;
+		for (int x = 0; x <= Config.loop; x++) { // for 30 vezes
 
 			// vetor para fo
-			int fo_peso[] = new int[numero_ind];
-			int fo_custo[] = new int[numero_ind];
-			int fo[] = new int[numero_ind];
+			int fo_volume[] = new int[Config.numeroInd];
+			int fo_custo[] = new int[Config.numeroInd];
+			int fo[] = new int[Config.numeroInd];
 
 			// inicializar populacao e avaliar
-			int populacao[][] = new int[numero_ind][nobj];
+			int populacao[][] = new int[Config.numeroInd][problema.getQtdGenes()];
 
-			for (int i = 0; i < numero_ind; i++) {
-				for (int j = 0; j < nobj; j++) {
-					if (Math.random() < 0.5)
+			for (int i = 0; i < Config.numeroInd; i++) {
+				for (int j = 0; j < problema.getQtdGenes(); j++) {
+					if (Math.random() < 0.5) {
 						populacao[i][j] = 0;
-					else
+					} else {
 						populacao[i][j] = 1;
+					}
 
 					// System.out.print(populacao[i][j]);
 				}
 				// System.out.print("\n");
 			}
-			// gerando função objetiva
-			for (int i = 0; i < numero_ind; i++) {
+			// gerando funï¿½ï¿½o objetiva
+			for (int i = 0; i < Config.numeroInd; i++) {
 				int soma = 0;
-				for (int j = 0; j < nobj; j++) {
-					fo_peso[i] += populacao[i][j] * peso[j];
-					fo_custo[i] += populacao[i][j] * beneficio[j];
+				for (int j = 0; j < problema.getQtdGenes(); j++) {
+					fo_volume[i] += populacao[i][j] * problema.getItens().get(j).getVolume();
+					fo_custo[i] += populacao[i][j] * problema.getItens().get(j).getValor();
 				}
 
 			}
 			// penalidade
-			for (int i = 0; i < numero_ind; i++) {
-				fo[i] = fo_custo[i] - alpha
-						* Math.abs(Math.min(0, b - fo_peso[i]));
-				 System.out.println("PESO: "+fo_peso[i]+" BENEFICIO: "+fo_custo[i] + " DEPOIS: "+fo[i]);
+			for (int i = 0; i < Config.numeroInd; i++) {
+				fo[i] = fo_custo[i] - Config.alpha * Math.abs(Math.min(0, problema.getMochila() - fo_volume[i]));
+				System.out.println("volume: " + fo_volume[i] + " valor: " + fo_custo[i] + " DEPOIS: " + fo[i]);
 			}
 
 			// processo evolucionario (recombinacao, mutacao e selecao)
-			
-			// cruzamento / recombinação
+
+			// cruzamento / recombinaï¿½ï¿½o
 			// random
 
 			int aux;
-			int aux_filho[][] = new int[numero_ind][nobj];
+			int aux_filho[][] = new int[Config.numeroInd][problema.getQtdGenes()];
 
-			for (int i = 0; i < numero_ind; i++) {
+			for (int i = 0; i < Config.numeroInd; i++) {
 				// aux = nobj /2;
 				aux = 5;
-				for (i = 0; i < numero_ind; i++) {
-					for (int j = 0; j < nobj; j++) {
+				for (i = 0; i < Config.numeroInd; i++) {
+					for (int j = 0; j < problema.getQtdGenes(); j++) {
 						if (i % 2 == 0) {
 							if (j <= aux) {
 								aux_filho[i][j] = populacao[i][j];
@@ -115,8 +83,8 @@ public class algoritmo {
 				}
 
 				// mutacao
-				for (i = 0; i < numero_ind; i++) {
-					for (int j = 0; j < nobj; j++) {
+				for (i = 0; i < Config.numeroInd; i++) {
+					for (int j = 0; j < problema.getQtdGenes(); j++) {
 						if (Math.random() < 0.1) {
 							if (aux_filho[i][j] == 0) {
 								aux_filho[i][j] = 1;
@@ -128,46 +96,43 @@ public class algoritmo {
 				}
 				// selecao
 
-				
 				int maior = 0;
 
-				for (i = 0; i < numero_ind; i++) {
-					for (int j = 0; j < nobj; j++) {
-						fo_peso[i] += aux_filho[i][j] * peso[j];
-						fo_custo[i] += aux_filho[i][j] * beneficio[j];
+				for (i = 0; i < Config.numeroInd; i++) {
+					for (int j = 0; j < problema.getQtdGenes(); j++) {
+						fo_volume[i] += aux_filho[i][j] * problema.getItens().get(j).getVolume();
+						fo_custo[i] += aux_filho[i][j] * problema.getItens().get(j).getValor();
 					}
-					// System.out.print("i: "+fo_peso[i]+"\n");
-					if (fo_peso[i] <= b) {
-						if (fo_peso[i] > maior) {
-							maior = fo_peso[i];
+					// System.out.print("i: "+fo_volume[i]+"\n");
+					if (fo_volume[i] <= problema.getMochila()) {
+						if (fo_volume[i] > maior) {
+							maior = fo_volume[i];
 						}
 					}
 
 				}
-				aux_melhor[x] = maior;
-			//	/System.out.print("geração " + x + " : ");
-				//System.out.print("melhor: " + maior + "\n");
+				auxMelhor[x] = maior;
+				// /System.out.print("geraï¿½ï¿½o " + x + " : ");
+				// System.out.print("melhor: " + maior + "\n");
 				// System.out.print(b);
 
 				/*
-				 * soma cada linha e depois multiplica pelo valor beneficio,
+				 * soma cada linha e depois multiplica pelo valor valor,
 				 * gerar ranking dos melhores
 				 */
-				
 
 			}
 
-		}//fim do loop
+		} // fim do loop
 
-		//gerando relatorio dos 30 individuos, o melhor de cada geração (elitismo)
-		Arrays.sort(aux_melhor);
+		// gerando relatorio dos 30 individuos, o melhor de cada geraï¿½ï¿½o (elitismo)
+		Arrays.sort(auxMelhor);
 		int a;
-		for (a=loop;a>=0;a--) {
-			System.out.println("Melhor individuo: "+aux_melhor[a]);
+		for (a = Config.loop; a >= 0; a--) {
+			System.out.println("Melhor individuo: " + auxMelhor[a]);
 		}
-		
-		
-		// verificar se os parametros estao certos, peso e custo
+
+		// verificar se os parametros estao certos, volume e custo
 
 	}
 
