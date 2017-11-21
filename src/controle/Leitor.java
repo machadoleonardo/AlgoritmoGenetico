@@ -1,10 +1,8 @@
+package controle;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
-
-import controle.Item;
-import controle.Problema;
 
 public class Leitor {
 

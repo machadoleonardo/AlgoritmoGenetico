@@ -1,3 +1,4 @@
+package controle;
 
 public class Config {
 	// definir parametros

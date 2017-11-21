@@ -1,6 +1,6 @@
-import java.util.Arrays;
+package controle;
 
-import controle.Problema;
+import java.util.Arrays;
 
 public class algoritmo {
 
@@ -34,7 +34,7 @@ public class algoritmo {
 				}
 				// System.out.print("\n");
 			}
-			// gerando fun��o objetiva
+			// gerando funções objetiva
 			for (int i = 0; i < Config.numeroInd; i++) {
 				int soma = 0;
 				for (int j = 0; j < problema.getQtdGenes(); j++) {
@@ -76,10 +76,8 @@ public class algoritmo {
 								aux_filho[i][j] = populacao[i - 1][j];
 							}
 						}
-						// System.out.print(aux_filho[i][j]);
 					}
 
-					// System.out.print("\n");
 				}
 
 				// mutacao
@@ -103,7 +101,6 @@ public class algoritmo {
 						fo_volume[i] += aux_filho[i][j] * problema.getItens().get(j).getVolume();
 						fo_custo[i] += aux_filho[i][j] * problema.getItens().get(j).getValor();
 					}
-					// System.out.print("i: "+fo_volume[i]+"\n");
 					if (fo_volume[i] <= problema.getMochila()) {
 						if (fo_volume[i] > maior) {
 							maior = fo_volume[i];
@@ -112,9 +109,6 @@ public class algoritmo {
 
 				}
 				auxMelhor[x] = maior;
-				// /System.out.print("gera��o " + x + " : ");
-				// System.out.print("melhor: " + maior + "\n");
-				// System.out.print(b);
 
 				/*
 				 * soma cada linha e depois multiplica pelo valor valor,
